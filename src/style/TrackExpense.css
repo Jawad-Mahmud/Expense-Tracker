@@ -1,0 +1,17 @@
+.profile{
+    height: 100px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    
+}
+
+.signout-btn{
+  height: 50px;
+  width: max-content;
+  border-radius: 20px;
+  border-style: none;
+}
+.profile-photo{
+    border-radius: 20px;
+}

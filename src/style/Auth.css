@@ -1,0 +1,16 @@
+.login-page{
+    
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.login-with-google-btn{
+    height: 100px;
+    width:200px ;
+    font-size: 1.5rem;
+    border-radius: 20px;
+    border-style: none;
+}
