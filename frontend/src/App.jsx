@@ -3,7 +3,7 @@ import { Route, Routes } from 'react-router-dom'
 import {Auth} from './pages/Auth'
 import { TrackExpense } from './pages/trackExpense'
 import { ProtectedRoutes } from './ProtectedRoutes/ProtectedRoutes'
-
+import { ShopifyPreview } from './components/ShopifyPreview'
 export const App = () => {
   return (
     <>
@@ -16,12 +16,14 @@ export const App = () => {
               path="/expense-tracker"
               element={
                 <ProtectedRoutes>
-                     <TrackExpense /> 
+                     <TrackExpense />
+
                 </ProtectedRoutes>
                   
                 
               }
             />
+            <Route path = "/shopify" element = {<ShopifyPreview/>}/>
           </Routes>
         
       </div>
