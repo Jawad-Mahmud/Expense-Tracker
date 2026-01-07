@@ -1,38 +1,44 @@
-// backend/services/shopifyService.js
 import axios from 'axios';
 
-const SHOPIFY_STORE = process.env.SHOPIFY_STORE; // expense-tracker-3.myshopify.com
-const SHOPIFY_TOKEN = process.env.SHOPIFY_TOKEN;  // shpat_xxxxx
 const API_VERSION = '2026-01';
-const shopifyApi = axios.create({
-  baseURL: `https://${SHOPIFY_STORE}/admin/api/${API_VERSION}`,
-  headers: {
-    'X-Shopify-Access-Token': SHOPIFY_TOKEN,
-    'Content-Type': 'application/json',
-  },
-});
 
-// 1. Get Recent Orders (Primary for expenses)
+// Lazy-load Axios client to prevent reading env variables at import time
+// Previously, Axios was created at module load, before dotenv ran, so SHOPIFY_STORE was undefined.
+function createShopifyClient() {
+  const SHOPIFY_STORE = process.env.SHOPIFY_STORE;
+  const SHOPIFY_TOKEN = process.env.SHOPIFY_TOKEN;
+
+  if (!SHOPIFY_STORE || !SHOPIFY_TOKEN) {
+    // This error now clearly explains why Axios would fail
+    throw new Error('SHOPIFY_STORE or SHOPIFY_TOKEN missing. This was the cause of ENOTFOUND undefined.');
+  }
+
+  return axios.create({
+    baseURL: `https://${SHOPIFY_STORE}/admin/api/${API_VERSION}`,
+    headers: {
+      'X-Shopify-Access-Token': SHOPIFY_TOKEN,
+      'Content-Type': 'application/json',
+    },
+  });
+}
+
 export async function getRecentOrders(days = 30, limit = 50) {
+  const shopifyApi = createShopifyClient();
   const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
-  const response = await shopifyApi.get(`/orders.json?limit=${limit}&status=any&created_at_min=${since}`);
-  return response.data.orders;
+  return (await shopifyApi.get(`/orders.json?limit=${limit}&status=any&created_at_min=${since}`)).data.orders;
 }
 
-// 2. Get Products (Inventory costs)
 export async function getProducts() {
-  const response = await shopifyApi.get('/products.json?limit=250');
-  return response.data.products;
+  const shopifyApi = createShopifyClient();
+  return (await shopifyApi.get('/products.json?limit=250')).data.products;
 }
 
-// 3. Get Order by ID (details for expense breakdown)
 export async function getOrder(orderId) {
-  const response = await shopifyApi.get(`/orders/${orderId}.json`);
-  return response.data.order;
+  const shopifyApi = createShopifyClient();
+  return (await shopifyApi.get(`/orders/${orderId}.json`)).data.order;
 }
 
-// 4. Get Payouts (Shopify Payments expenses/fees)
 export async function getPayouts() {
-  const response = await shopifyApi.get('/payouts.json?limit=10');
-  return response.data.payouts;
+  const shopifyApi = createShopifyClient();
+  return (await shopifyApi.get('/payouts.json?limit=10')).data.payouts;
 }

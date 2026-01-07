@@ -1,5 +1,3 @@
-// backend/routes/shopifyRoutes.js
-
 import express from 'express';
 import {
   getRecentOrders,
