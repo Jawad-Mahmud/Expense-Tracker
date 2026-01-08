@@ -7,41 +7,34 @@ export const ShopifyPreview =()=> {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    // Fetch orders from your Node.js backend
-    fetch('http://localhost:5000/api/shopify/orders')
-      .then(res => {
-        if (!res.ok) throw new Error('Failed to fetch orders');
-        return res.json();
-      })
-      .then(data => {
-        setOrders(data.orders || []);
-        console.log('📦 Full Orders Data (check this in console):', data.orders);
-      })
-      .catch(err => {
-        setError('Orders: ' + err.message);
-        console.error(err);
-      });
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      // Fetch orders
+      const ordersRes = await fetch('http://localhost:5000/api/shopify/orders');
+      if (!ordersRes.ok) throw new Error('Failed to fetch orders');
+      const ordersData = await ordersRes.json();
+      setOrders(ordersData.orders || []);
+      console.log('📦 Full Orders Data (check this in console):', ordersData.orders);
 
-    // Fetch products
-    fetch('http://localhost:5000/api/shopify/products')
-      .then(res => {
-        if (!res.ok) throw new Error('Failed to fetch products');
-        return res.json();
-      })
-      .then(data => {
-        setProducts(data.products || []);
-        console.log('🛍️ Full Products Data (check this in console):', data.products);
-        setLoading(false);
-      })
-      .catch(err => {
-        setError('Products: ' + err.message);
-        console.error(err);
-        setLoading(false);
-      });
-  }, []);
+      // Fetch products
+      const productsRes = await fetch('http://localhost:5000/api/shopify/products');
+      if (!productsRes.ok) throw new Error('Failed to fetch products');
+      const productsData = await productsRes.json();
+      setProducts(productsData.products || []);
+      console.log('🛍️ Full Products Data (check this in console):', productsData.products);
 
-  if (loading) {
+      setLoading(false);
+    } catch (err) {
+      setError(err.message);
+      console.error(err);
+      setLoading(false);
+    }
+  };
+
+  fetchData();
+}, []);  
+if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <p className="text-xl">Loading your Shopify data...</p>
@@ -161,6 +154,6 @@ export const ShopifyPreview =()=> {
           </p>
         </div>
       </div>
-    </div>
+    </div> 
   );
 }

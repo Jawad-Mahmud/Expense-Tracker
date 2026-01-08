@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useAddTransaction } from '../hooks/useAddTransaction'
 import { useGetTransaction } from '../hooks/useGetTransaction';
 import { useGetData } from '../hooks/useGetData';
@@ -18,7 +18,28 @@ export const TrackExpense = () => {
     const [transactionType, settransactionType] = useState("expense");
     const {income,expense,balance} = totalTransaction
     const navigate =useNavigate();
-    
+    const [orders, setOrders] = useState([])
+   useEffect(() => {
+    try {
+      const fetchData = async()=>{
+      const orderRes = await fetch('http://localhost:5000/api/shopify/orders')
+      if(!orderRes) throw new Error('failed to fetch orders');
+      console.log("this is order res",orderRes)
+      const orderData = await orderRes.json()
+       setOrders(orderData.orders|| []);
+    }
+      
+    } catch (err) {
+   console.log(err);
+      
+    }
+   fetchData();
+
+
+   }, [])
+   
+
+
     const signUserOut = async() =>{
      try {
       await signOut(auth);
@@ -39,6 +60,7 @@ export const TrackExpense = () => {
         setdescription("");
         settransactionAmount("")
     }
+
   return (
     <>
    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-8">
